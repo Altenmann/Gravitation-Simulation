@@ -12,13 +12,23 @@ import main.states.CursorMode;
 import main.states.SolarSystemState;
 import math.Maths;
 
+
+/**
+ * @author admin
+ * 
+ * @param mainBody - the point of reference for calculations
+ * @param heldBody
+ * @param selectedBody
+ * @param clamp 
+ *
+ */
 public class Body implements Collider {
 	
 	public static Body mainBody;
 	public static Body heldBody;
 	public static Body selectedBody;
 	
-	public static boolean clamp = false;
+	public static boolean clamp = true;
 	private static int clampType = 1;
 	public static boolean shadows = false;
 	public static boolean showVectors = false;
