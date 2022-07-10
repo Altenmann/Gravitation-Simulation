@@ -21,6 +21,7 @@ import main.buttons.VectorButton;
 import main.gfx.Camera;
 import objects.Body;
 import objects.Collider;
+import test.Tester;
 
 
 /**
@@ -122,17 +123,17 @@ public class SolarSystemState extends State {
 
 		// Bodies to add
 		Body Sun = new Body("Sun", width / 2, height / 2, 12, 1989);
-		Body Mercury = new Body("Mercury", width / 2, height / 2 + 36 * 2, 3, .3285);
+		Body Mercury = new Body("Mercury", width / 2, height / 2 + 28 * 2, 3, .3275);
 		Body Venus = new Body("Venus", width / 2 - 67 * 2, height / 2, 5, 4.867);
 		Body Earth = new Body("Earth", width / 2, height / 2 - 93 * 2, 6, 5.972);
-		Body Moon = new Body("Moon", width / 2, height / 2 - 92 * 2 - 17, 2, .07346);
+		Body Moon = new Body("Moon", width / 2, height / 2 - 93 * 2 - 15, 2, .07376);
 		Body Mars = new Body("Mars", width / 2 + 142 * 2, height / 2, 4, .639);
 
 		// Initial velocities
-		Mercury.setVel(-1.5, 0);
+		Mercury.setVel(-1.75, 0);
 		Venus.setVel(0, 1.05);
 		Earth.setVel(.969, 0);
-		Moon.setVel(.8, 0);
+		Moon.setVel(.777, 0);
 		Mars.setVel(0, .778);
 
 		// Images used
@@ -233,9 +234,19 @@ public class SolarSystemState extends State {
 		}
 
 	}
+	
+	// Can only be used by one thing at a time (currently)
+	private void testTime(String info) {
+		double testTime = Tester.TimeTest();
+		if(testTime != -1) System.out.println(info + " Nano Time: " + testTime);
+	}
+	private void testTime() {
+		testTime("");
+	}
 
 	// Update method
 	public void tick() {
+		
 		if (paused)
 			return; // Does not go past this if paused
 
@@ -246,7 +257,7 @@ public class SolarSystemState extends State {
 
 		// Changes the velocity of bodies based on other bodies positions
 		Gravity.Gravitate(bodies);
-
+		
 		for (Body b : bodies) {
 			b.tick();
 			b.clamp(0, 0, engine.getWidth(), engine.getHeight() - 34);
@@ -262,7 +273,6 @@ public class SolarSystemState extends State {
 
 	// Drawing method
 	public void render(Graphics g) {
-
 		// Background
 		g.setColor(Color.black);
 		g.fillRect(0, 0, engine.getWidth(), engine.getHeight());
@@ -380,11 +390,14 @@ public class SolarSystemState extends State {
 
 	// Adds a black hole to the simulation
 	public static void addBlackHole() {
-		// TODO Auto-generated method stub
-		Body blackhole = new Body("Black Hole", 0, 0, 14, 100000);
-		blackhole.setImage(Resource.blackhole);
-		bodies.add(blackhole);
-		Body.selectedBody = blackhole;
+		try {
+			Body blackhole = new Body("Black Hole", 0, 0, 14, 100000);
+			blackhole.setImage(Resource.blackhole);
+			bodies.add(blackhole);
+			Body.selectedBody = blackhole;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

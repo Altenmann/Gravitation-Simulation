@@ -146,8 +146,8 @@ public class Body implements Collider {
 		if(stationary) return;
 		
 		// Changes position based on velocity
-		x = x + xVel;
-		y = y + yVel;
+		x += xVel + xAcc/2;
+		y += yVel + yAcc/2;
 		
 		xVel += xAcc;
 		yVel += yAcc;
