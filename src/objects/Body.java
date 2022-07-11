@@ -70,13 +70,11 @@ public class Body implements Collider {
 	public void onClick() {
 		if(SolarSystemState.getCursorMode() != CursorMode.select) return; 
 		Body.selectedBody = this;
-		SolarSystemState.switchCursorMode();
 	}
 	
 	public void onPress(Camera camera) {
 		if(SolarSystemState.getCursorMode() == CursorMode.select) {
 			Body.selectedBody = this;
-			SolarSystemState.switchCursorMode();
 			return;
 		}
 		if(SolarSystemState.getCursorMode() != CursorMode.hand) return;
@@ -200,6 +198,14 @@ public class Body implements Collider {
 		}
 		
 		if(!showVectors) return;
+		
+		double xVel = this.xVel;
+		double yVel = this.yVel;
+		if(selectedBody != null) {
+			double[] velDiff = getRelativeVelocity(selectedBody);
+			xVel = velDiff[0];
+			yVel = velDiff[1];
+		}
 		g.setColor(Color.green);
 		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xVel*50), (int)(y-camera.getY()+yVel*50));
 		
@@ -220,6 +226,8 @@ public class Body implements Collider {
 	public double getY() { return y; }
 	public double getMass() { return mass; }
 	public double getRadius() { return radius; }
+	public double getXVel() { return xVel; }
+	public double getYVel() { return yVel; }
 	
 	// Sets the velocity
 	public void setVel(double xVel, double yVel) {
@@ -241,6 +249,14 @@ public class Body implements Collider {
 	// Gets distance to a certain body
 	public double getDistTo(Body b) {
 		return Math.sqrt( Math.pow(x - b.getX(), 2) + Math.pow(y - b.getY(), 2));
+	}
+	
+	public double[] getRelativeVelocity(Body b) {
+		double xVelDiff = xVel - b.getXVel();
+		double yVelDiff = yVel - b.getYVel();
+		
+		double[] velDiffs = {xVelDiff, yVelDiff};
+		return velDiffs;
 	}
 	
 	// Gets the angle to a certain body

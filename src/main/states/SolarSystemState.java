@@ -125,14 +125,14 @@ public class SolarSystemState extends State {
 		Body Mercury = new Body("Mercury", width / 2, height / 2 + 36 * 2, 3, .3285);
 		Body Venus = new Body("Venus", width / 2 - 67 * 2, height / 2, 5, 4.867);
 		Body Earth = new Body("Earth", width / 2, height / 2 - 93 * 2, 6, 5.972);
-		Body Moon = new Body("Moon", width / 2, height / 2 - 92 * 2 - 17, 2, .07346);
+		Body Moon = new Body("Moon", width / 2, height / 2 - 93 * 2 - 12, 2, .07346);
 		Body Mars = new Body("Mars", width / 2 + 142 * 2, height / 2, 4, .639);
 
 		// Initial velocities
 		Mercury.setVel(-1.5, 0);
 		Venus.setVel(0, 1.05);
-		Earth.setVel(.969, 0);
-		Moon.setVel(.8, 0);
+		Earth.setVel(.947, 0);
+		Moon.setVel(.767, 0);
 		Mars.setVel(0, .778);
 
 		// Images used
