@@ -4,21 +4,21 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 
 import forces.Gravity;
-import gui.Panel;
 import main.GameEngine;
 import main.Resource;
 import main.buttons.AddBodyButton;
 import main.buttons.Button;
+import main.buttons.ClampButton;
 import main.buttons.CursorModeButton;
 import main.buttons.PlayPauseButton;
 import main.buttons.ResetButton;
 import main.buttons.VectorButton;
-import main.gfx.Camera;
 import objects.Body;
 import objects.Collider;
 
@@ -35,32 +35,19 @@ public class SolarSystemState extends State {
 
 	// Stores all celestial bodies
 	private static ArrayList<Body> bodies;
-	// Removes all bodies from the @bodies array list on start of tick
+	// Removes all bodies from the bodies array list on start of tick
 	private static ArrayList<Body> removeBodies;
 
 	// Buttons for GUI
 	private static ArrayList<Button> buttons;
 
-	// Used for displaying individual planet properties
-	private static Panel bodyPanel;
-
 	// Changes the cursor mode to interact with things differently
 	private static CursorMode cursorMode;
 
-	// Used if planets should update their positions or not
-	private static boolean paused;
-	// If true will show the planets velocities and acceleration
-	private static boolean vectors;
-
-	// A camera used to follow the planets around
-	private static Camera camera;
-
 	public SolarSystemState(GameEngine engine) {
-		super(engine); // Creates a state
-
-		paused = true; // Starts the simulation paused
-		vectors = false; // Shows no vectors by default
-		Body.showVectors = vectors; // Body vector value (could change to 1 variable)
+		super(engine); // Creates this state
+		
+		Body.showVectors = false; // Does not show the planets' vectors by default
 
 		bodies = new ArrayList<Body>();
 		removeBodies = new ArrayList<Body>();
@@ -71,15 +58,13 @@ public class SolarSystemState extends State {
 
 		// Adds the various buttons
 		buttons.add(new PlayPauseButton(300, 20, 32, 32, paused)); // Plays & pauses
-		buttons.add(new VectorButton(300, 60, 32, 32, vectors)); // Turn on and off vectors
+		buttons.add(new VectorButton(300, 60, 32, 32)); // Turn on and off vectors
 		buttons.add(new ResetButton(300, 100, 32, 32)); // Resets the bodies to the starting positions and velocities
 		buttons.add(new CursorModeButton(340, 20, 32, 32)); // Changes the cursor mode (needs improvements)
 		buttons.add(new AddBodyButton(340, 60, 32, 32)); // Adds a black hole (later will add options)
+		buttons.add(new ClampButton(340, 100, 32, 32));
 
 		bodySetSolarSystem1(); // Adds set of Bodies
-
-		// Sets the camera to 0, 0 (meaningless atm)
-		camera = new Camera(0, 0);
 	}
 
 	// A static method called from inside bodies to remove itself from the
@@ -108,12 +93,14 @@ public class SolarSystemState extends State {
 		paused = !paused;
 	}
 
-	// Switches the vectors and updates the Body class to match
+	// Switches the vectors display
 	public static void vectorSwitch() {
-		vectors = !vectors;
-		Body.showVectors = vectors;
+		Body.showVectors = !Body.showVectors;
 	}
-
+	
+	/*
+	 * TODO Calculate proper simulated distances and masses
+	 */
 	// Adding all the bodies and their properties
 	private static void bodySetSolarSystem1() {
 		// G = .1
@@ -125,14 +112,14 @@ public class SolarSystemState extends State {
 		Body Mercury = new Body("Mercury", width / 2, height / 2 + 36 * 2, 3, .3285);
 		Body Venus = new Body("Venus", width / 2 - 67 * 2, height / 2, 5, 4.867);
 		Body Earth = new Body("Earth", width / 2, height / 2 - 93 * 2, 6, 5.972);
-		Body Moon = new Body("Moon", width / 2, height / 2 - 92 * 2 - 17, 2, .07346);
+		Body Moon = new Body("Moon", width / 2, height / 2 - 93 * 2 - 12, 2, .07346);
 		Body Mars = new Body("Mars", width / 2 + 142 * 2, height / 2, 4, .639);
 
 		// Initial velocities
 		Mercury.setVel(-1.5, 0);
 		Venus.setVel(0, 1.05);
-		Earth.setVel(.969, 0);
-		Moon.setVel(.8, 0);
+		Earth.setVel(.947, 0);
+		Moon.setVel(.767, 0);
 		Mars.setVel(0, .778);
 
 		// Images used
@@ -158,17 +145,7 @@ public class SolarSystemState extends State {
 		bodies.add(Mars);
 	}
 
-	// A body panel used to display information on selected planets
-	public static void createBodyPanel(Body b) {
-		bodyPanel = new Panel(25, 400, 150, 150);
-	}
-
-	// Deletes the panel (hiding might be better and reusing)
-	// Currently unused
-	public static void removePanel() {
-		bodyPanel = null;
-	}
-
+	// TODO Fix cursor modes
 	// Gets the current cursorMode
 	public static CursorMode getCursorMode() {
 		return cursorMode;
@@ -196,17 +173,16 @@ public class SolarSystemState extends State {
 	// changes the cursor mode to another (used inside Body)
 	public static void switchCursorMode() {
 		switch (cursorMode) {
-		case select:
+		case select: // Switches to hand from select
 			setCursorMode(CursorMode.hand);
 			break;
-		case hand:
+		case hand: // Switches to select from hand
 			setCursorMode(CursorMode.select);
 			break;
-		default:
+		default: // Defaults to select
 			setCursorMode(CursorMode.select);
 		}
-
-		setCursor();
+		setCursor(); // Applies changes
 	}
 
 	// Renders the buttons
@@ -249,12 +225,15 @@ public class SolarSystemState extends State {
 
 		for (Body b : bodies) {
 			b.tick();
-			b.clamp(0, 0, engine.getWidth(), engine.getHeight() - 34);
+			b.clamp(0, 0, engine.getWidth(), engine.getHeight());
 		}
 
 		if (Body.selectedBody != null) {
-			double desiredX = Body.selectedBody.getX() - engine.getWidth() / 2;
-			double desiredY = Body.selectedBody.getY() - engine.getHeight() / 2;
+			// TODO Fix camera offset
+			camera.setOffset((int)(Body.selectedBody.getX() - Body.selectedBody.getStartClickX()), 
+					(int)(Body.selectedBody.getY() - Body.selectedBody.getStartClickY()));
+			double desiredX = camera.getXOffset();
+			double desiredY = camera.getYOffset();
 			camera.setX((int) desiredX);
 			camera.setY((int) desiredY);
 		}
@@ -262,20 +241,18 @@ public class SolarSystemState extends State {
 
 	// Drawing method
 	public void render(Graphics g) {
+		// TODO Organize the use of Graphics and Graphics2D
+		Graphics2D g2d = (Graphics2D) g;
 
 		// Background
-		g.setColor(Color.black);
+		g2d.drawImage(Resource.milkyWayBg, 0, 0, engine.getWidth(), engine.getHeight(), null);
+		g.setColor(new Color(0, 0, 0, .85f));
 		g.fillRect(0, 0, engine.getWidth(), engine.getHeight());
-
-		// Body panel
-		if (bodyPanel != null) {
-			bodyPanel.draw(g);
-		}
 
 		// Border lines
 		if (Body.clamp) {
 			g.setColor(Color.white);
-			g.drawRect(-camera.getX(), -camera.getY(), engine.getWidth(), engine.getHeight() - 34);
+			g.drawRect(-camera.getX(), -camera.getY(), engine.getWidth(), engine.getHeight());
 		}
 
 		// GUI
@@ -318,12 +295,10 @@ public class SolarSystemState extends State {
 	public void mouseDragged(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
-
-		if (Panel.selectedPanel != null) {
-			Panel.selectedPanel.onDrag(x, y);
-			return;
-		}
-
+		
+		if (Objects.nonNull(Body.selectedBody)) {
+			Body.selectedBody.onDrag(x, y, camera);
+		} else 
 		if (Objects.nonNull(Body.heldBody)) {
 			Body.heldBody.onDrag(x, y, camera);
 			return;
@@ -335,9 +310,6 @@ public class SolarSystemState extends State {
 		if (Objects.nonNull(Body.heldBody)) {
 			Body.heldBody.releaseHeldBody(e.getX(), e.getY(), paused);
 		}
-
-		if (Panel.selectedPanel != null)
-			Panel.selectedPanel = null;
 	}
 
 	@Override
@@ -346,13 +318,9 @@ public class SolarSystemState extends State {
 		int y = e.getY();
 		for (Body b : bodies) {
 			if (b.checkBounds(x, y, camera)) {
-				b.onPress(camera);
+				b.onPress(x, y, camera);
 				return;
 			}
-		}
-
-		if (bodyPanel != null && bodyPanel.checkBounds(x, y)) {
-			Panel.selectedPanel = bodyPanel;
 		}
 	}
 
@@ -365,12 +333,6 @@ public class SolarSystemState extends State {
 			} else
 				b.offHover();
 		}
-
-		if (bodyPanel != null && bodyPanel.checkBounds(e.getX(), e.getY())) {
-			changeCursor(Cursor.MOVE_CURSOR);
-		} else {
-			setCursor(); // Fix this
-		}
 	}
 
 	// Changes the frames cursor using engine's changeCursor method
@@ -380,11 +342,21 @@ public class SolarSystemState extends State {
 
 	// Adds a black hole to the simulation
 	public static void addBlackHole() {
-		// TODO Auto-generated method stub
+		// TODO Black holes
 		Body blackhole = new Body("Black Hole", 0, 0, 14, 100000);
 		blackhole.setImage(Resource.blackhole);
 		bodies.add(blackhole);
 		Body.selectedBody = blackhole;
+	}
+
+	public static boolean isBodyVectors() {
+		// TODO Clean this
+		return Body.showVectors;
+	}
+
+	public static void clampSwitch() {
+		// TODO Clean this
+		Body.clamp = !Body.clamp;
 	}
 
 }

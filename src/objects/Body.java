@@ -35,8 +35,11 @@ public class Body implements Collider {
 	
 	private String name;
 	
+	// TODO Make a vectors and/or physics body class
 	private double x, y, mass, radius, xVel, yVel, xAcc, yAcc;
 	private int startingX, startingY, endX, endY;
+	
+	private int startClickX, startClickY;
 	
 	public boolean stationary = false;
 	private boolean emitsPhotons = false;
@@ -60,7 +63,7 @@ public class Body implements Collider {
 		image = Resource.ball;
 	}
 	
-	// Checks if a given x and y position and camera location if its inside the boundries of the circle
+	// Checks if a given x and y position and camera location if its inside the boundaries of the circle
 	public boolean checkBounds(int x, int y, Camera camera) {
 		return (x >= this.x - radius - camera.getX() && x <= this.x + radius - camera.getX() && 
 				y <= this.y + radius - camera.getY() && y >= this.y - radius - camera.getY());
@@ -69,14 +72,14 @@ public class Body implements Collider {
 	// What to do when a body is clicked
 	public void onClick() {
 		if(SolarSystemState.getCursorMode() != CursorMode.select) return; 
-		Body.selectedBody = this;
-		SolarSystemState.switchCursorMode();
+		
 	}
 	
-	public void onPress(Camera camera) {
+	public void onPress(int x, int y, Camera camera) {
 		if(SolarSystemState.getCursorMode() == CursorMode.select) {
 			Body.selectedBody = this;
-			SolarSystemState.switchCursorMode();
+			startClickX = x;
+			startClickY = y;
 			return;
 		}
 		if(SolarSystemState.getCursorMode() != CursorMode.hand) return;
@@ -90,6 +93,11 @@ public class Body implements Collider {
 	}
 	
 	public void onDrag(int x, int y, Camera camera) {
+		if(SolarSystemState.getCursorMode() == CursorMode.select) {
+			startClickX = x;
+			startClickY = y;
+			return;
+		}
 		if(SolarSystemState.getCursorMode() != CursorMode.hand) return;
 		
 		endX = x; 
@@ -105,8 +113,8 @@ public class Body implements Collider {
 		
 		double dist = Maths.dist(xdiff, ydiff);
 		
-		xVel += dist * (xdiff / tdiff) / 50;
-		yVel += dist * (ydiff / tdiff) / 50;
+		xVel += dist * (xdiff / tdiff) / 200;
+		yVel += dist * (ydiff / tdiff) / 200;
 		
 		release = true;
 	}
@@ -137,12 +145,10 @@ public class Body implements Collider {
 	}
 	
 	public void tick() {
-		
-		if (release) {
-			Body.heldBody = null;
+		if(release) {
 			release = false;
+			heldBody = null;
 		}
-		
 		if(stationary) return;
 		
 		// Changes position based on velocity
@@ -188,8 +194,8 @@ public class Body implements Collider {
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
-			int sx = startingX;// - camera.getX();
-			int sy = startingY;// - camera.getY();
+			int sx = startClickX;// - camera.getX();
+			int sy = startClickY;// - camera.getY();
 			int ex = endX;// - camera.getX();
 			int ey = endY;// - camera.getX();
 			g.setColor(Color.cyan);
@@ -200,6 +206,14 @@ public class Body implements Collider {
 		}
 		
 		if(!showVectors) return;
+		
+		double xVel = this.xVel;
+		double yVel = this.yVel;
+		if(selectedBody != null) {
+			double[] velDiff = getRelativeVelocity(selectedBody);
+			xVel = velDiff[0];
+			yVel = velDiff[1];
+		}
 		g.setColor(Color.green);
 		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xVel*50), (int)(y-camera.getY()+yVel*50));
 		
@@ -220,6 +234,11 @@ public class Body implements Collider {
 	public double getY() { return y; }
 	public double getMass() { return mass; }
 	public double getRadius() { return radius; }
+	public double getXVel() { return xVel; }
+	public double getYVel() { return yVel; }
+	
+	public int getStartClickX() { return startClickX; }
+	public int getStartClickY() { return startClickY; }
 	
 	// Sets the velocity
 	public void setVel(double xVel, double yVel) {
@@ -241,6 +260,14 @@ public class Body implements Collider {
 	// Gets distance to a certain body
 	public double getDistTo(Body b) {
 		return Math.sqrt( Math.pow(x - b.getX(), 2) + Math.pow(y - b.getY(), 2));
+	}
+	
+	public double[] getRelativeVelocity(Body b) {
+		double xVelDiff = xVel - b.getXVel();
+		double yVelDiff = yVel - b.getYVel();
+		
+		double[] velDiffs = {xVelDiff, yVelDiff};
+		return velDiffs;
 	}
 	
 	// Gets the angle to a certain body

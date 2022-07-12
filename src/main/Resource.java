@@ -11,12 +11,14 @@ public final class Resource {
 //--------------------------------------------------------------------------------
 	private static BufferedImage sheet;
 	
-	// TODO: Organize
+	// TODO: Organize images
 	public static BufferedImage playButton, pauseButton, vectorOff, vectorOn, ball, shadow;
 	public static BufferedImage sun, mercury, venus, earth, moon, mars, blackhole;
 	public static BufferedImage whiteCircleArrow, redCircleArrow, addButton;
 	public static BufferedImage cyanSelector, blackCircle;
 	public static BufferedImage cursorSelector, cursorHand;
+	
+	public static BufferedImage milkyWayBg;
 //--------------------------------------------------------------------------------
 // Initialization 
 //--------------------------------------------------------------------------------
@@ -49,6 +51,8 @@ public final class Resource {
 		blackCircle = crop(64, 160, 64, 64);
 		
 		blackhole = crop(128, 160, 64, 64);
+		
+		milkyWayBg = loadImage("/textures/milky-way.jpg");
 	}
 	
 //--------------------------------------------------------------------------------

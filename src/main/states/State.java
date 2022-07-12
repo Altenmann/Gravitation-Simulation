@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import main.GameEngine;
+import main.gfx.Camera;
 
 public abstract class State {
 	
@@ -13,9 +14,16 @@ public abstract class State {
 	protected static GameEngine engine;
 	
 	protected static boolean resetState = false;
+	
+	protected static Camera camera;
+	protected static boolean paused;
 
 	public State(GameEngine engine) {
 		State.engine = engine;
+		
+		camera = new Camera(0, 0);
+		camera.setOffset(0, 0);
+		paused = true;
 	}
 	
 	// Sub-class methods
