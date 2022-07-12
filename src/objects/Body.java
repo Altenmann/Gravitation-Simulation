@@ -35,8 +35,11 @@ public class Body implements Collider {
 	
 	private String name;
 	
+	// TODO Make a vectors and/or physics body class
 	private double x, y, mass, radius, xVel, yVel, xAcc, yAcc;
 	private int startingX, startingY, endX, endY;
+	
+	private int startClickX, startClickY;
 	
 	public boolean stationary = false;
 	private boolean emitsPhotons = false;
@@ -60,7 +63,7 @@ public class Body implements Collider {
 		image = Resource.ball;
 	}
 	
-	// Checks if a given x and y position and camera location if its inside the boundries of the circle
+	// Checks if a given x and y position and camera location if its inside the boundaries of the circle
 	public boolean checkBounds(int x, int y, Camera camera) {
 		return (x >= this.x - radius - camera.getX() && x <= this.x + radius - camera.getX() && 
 				y <= this.y + radius - camera.getY() && y >= this.y - radius - camera.getY());
@@ -69,12 +72,14 @@ public class Body implements Collider {
 	// What to do when a body is clicked
 	public void onClick() {
 		if(SolarSystemState.getCursorMode() != CursorMode.select) return; 
-		Body.selectedBody = this;
+		
 	}
 	
-	public void onPress(Camera camera) {
+	public void onPress(int x, int y, Camera camera) {
 		if(SolarSystemState.getCursorMode() == CursorMode.select) {
 			Body.selectedBody = this;
+			startClickX = x;
+			startClickY = y;
 			return;
 		}
 		if(SolarSystemState.getCursorMode() != CursorMode.hand) return;
@@ -88,6 +93,11 @@ public class Body implements Collider {
 	}
 	
 	public void onDrag(int x, int y, Camera camera) {
+		if(SolarSystemState.getCursorMode() == CursorMode.select) {
+			startClickX = x;
+			startClickY = y;
+			return;
+		}
 		if(SolarSystemState.getCursorMode() != CursorMode.hand) return;
 		
 		endX = x; 
@@ -135,12 +145,7 @@ public class Body implements Collider {
 	}
 	
 	public void tick() {
-		
-		if (release) {
-			Body.heldBody = null;
-			release = false;
-		}
-		
+		if(release) release = false;
 		if(stationary) return;
 		
 		// Changes position based on velocity
@@ -186,8 +191,8 @@ public class Body implements Collider {
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
-			int sx = startingX;// - camera.getX();
-			int sy = startingY;// - camera.getY();
+			int sx = startClickX;// - camera.getX();
+			int sy = startClickY;// - camera.getY();
 			int ex = endX;// - camera.getX();
 			int ey = endY;// - camera.getX();
 			g.setColor(Color.cyan);
@@ -228,6 +233,9 @@ public class Body implements Collider {
 	public double getRadius() { return radius; }
 	public double getXVel() { return xVel; }
 	public double getYVel() { return yVel; }
+	
+	public int getStartClickX() { return startClickX; }
+	public int getStartClickY() { return startClickY; }
 	
 	// Sets the velocity
 	public void setVel(double xVel, double yVel) {

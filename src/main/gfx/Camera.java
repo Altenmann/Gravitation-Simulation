@@ -12,7 +12,7 @@ package main.gfx;
  */
 public class Camera {
 	
-	private int x, y;
+	private int x, y, xoffset, yoffset;
 	
 	public Camera(int x, int y) {
 		this.x = x;
@@ -21,6 +21,8 @@ public class Camera {
 	
 	public int getX() { return x; }
 	public int getY() { return y; }
+	public int getXOffset() { return xoffset; }
+	public int getYOffset() { return yoffset; }
 
 	public void setX(int x) {
 		this.x = x;
@@ -28,5 +30,10 @@ public class Camera {
 	
 	public void setY(int y) {
 		this.y = y;
+	}
+	
+	public void setOffset(int xoffset, int yoffset) {
+		this.xoffset = xoffset;
+		this.yoffset = yoffset;
 	}
 }

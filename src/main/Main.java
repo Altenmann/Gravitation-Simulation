@@ -1,5 +1,6 @@
 package main;
 
+import main.states.GameState;
 import main.states.SolarSystemState;
 import main.states.State;
 
@@ -9,6 +10,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		engine = new GameEngine();
-		State.currentState = new SolarSystemState(engine);
+		SolarSystemState sss = new SolarSystemState(engine);
+		GameState gs = new GameState(engine);
+		
+		State.currentState = sss;
 	}
 }
