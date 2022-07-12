@@ -145,6 +145,7 @@ public class SolarSystemState extends State {
 		bodies.add(Mars);
 	}
 
+	// TODO Fix cursor modes
 	// Gets the current cursorMode
 	public static CursorMode getCursorMode() {
 		return cursorMode;

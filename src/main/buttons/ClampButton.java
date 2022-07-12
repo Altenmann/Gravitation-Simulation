@@ -17,15 +17,9 @@ public class ClampButton extends Button {
 	}
 
 	@Override
-	public void onHover() {
-		// TODO Auto-generated method stub
-
-	}
+	public void onHover() {}
 
 	@Override
-	public void offHover() {
-		// TODO Auto-generated method stub
-
-	}
+	public void offHover() {}
 
 }

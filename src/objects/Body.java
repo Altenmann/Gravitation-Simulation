@@ -113,8 +113,8 @@ public class Body implements Collider {
 		
 		double dist = Maths.dist(xdiff, ydiff);
 		
-		xVel += dist * (xdiff / tdiff) / 50;
-		yVel += dist * (ydiff / tdiff) / 50;
+		xVel += dist * (xdiff / tdiff) / 200;
+		yVel += dist * (ydiff / tdiff) / 200;
 		
 		release = true;
 	}
@@ -145,7 +145,10 @@ public class Body implements Collider {
 	}
 	
 	public void tick() {
-		if(release) release = false;
+		if(release) {
+			release = false;
+			heldBody = null;
+		}
 		if(stationary) return;
 		
 		// Changes position based on velocity
