@@ -17,6 +17,7 @@ public class BodyButton extends Button {
 	@Override
 	public void onClick() {
 		Body.selectedBody = b;
+		SolarSystemState.center(b);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class BodyButton extends Button {
 
 	@Override
 	public void offHover() {
-		SolarSystemState.center((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody);
+		//SolarSystemState.center((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody);
 	}
 
 }

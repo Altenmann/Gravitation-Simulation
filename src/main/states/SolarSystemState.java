@@ -239,8 +239,8 @@ public class SolarSystemState extends State {
 
 		if (Body.selectedBody != null) {
 			// TODO Fix camera offset and zoom
-			camera.setOffset((int)(Body.selectedBody.getX() - Body.selectedBody.getStartClickX()), 
-					(int)(Body.selectedBody.getY() - Body.selectedBody.getStartClickY()));
+			camera.setOffset((int)(Body.selectedBody.getX()*camera.getZoom() - Body.selectedBody.getStartClickX()), 
+					(int)(Body.selectedBody.getY()*camera.getZoom() - Body.selectedBody.getStartClickY()));
 			double desiredX = camera.getXOffset();
 			double desiredY = camera.getYOffset();
 			camera.setX((int) desiredX);
@@ -379,6 +379,7 @@ public class SolarSystemState extends State {
 
 	public static void center(Body b) {
 		camera.setLocation(b.getX() * camera.getZoom() - engine.getWidth() / 2, b.getY() * camera.getZoom() - engine.getHeight() / 2);
+		b.center(engine.getWidth(), engine.getHeight());
 		//camera.setZoom(.00001);
 	}
 	

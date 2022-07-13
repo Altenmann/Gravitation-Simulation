@@ -331,4 +331,9 @@ public class Body implements Collider {
 		this.xAcc = xForce / mass;
 		this.yAcc = yForce / mass;
 	}
+
+	public void center(int width, int height) {
+		startClickX = width/2;
+		startClickY = height/2;
+	}
 }
