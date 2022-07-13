@@ -8,24 +8,26 @@ import objects.Body;
 // Used to simulate gravity given a set of bodies
 public class Gravity {
 	
+	// Gravitational constant
+	static final double G = 6.6743E-11;
+	
 	public static void Gravitate(ArrayList<Body> bodies) {
-		
-		// Gravitational constant
-		double G = .1;
 		
 		// X and Y ratios given x dist over total dist
 		double xRatio, yRatio;
 		
 		// The variables used to determine the acceleration applied to given bodies
-		double xdiff, ydiff, dist, tdiff, xAcc, yAcc, acc;
+		double xdiff, ydiff, dist, tdiff;
+		
+		double gforce, xforce, yforce;
 		
 		// TODO: Add a more efficient implementation of gravitational forces
 		
 		// Loops through all bodies
 		for (Body b1: bodies) {
 			// Sets the acceleration back to 0 for each body
-			xAcc = 0; 
-			yAcc = 0;
+			xforce = 0; 
+			yforce = 0;
 			
 			// Loops through all bodies and applies the given acceleration
 			for (Body b2: bodies) {
@@ -45,16 +47,16 @@ public class Gravity {
 				xRatio = xdiff / tdiff;
 				yRatio = ydiff / tdiff;
 				
-				// Acceleration to be applied to b1 from b2
-				acc = G * b2.getMass() / Math.pow(dist, 2);
+				// Force between the 2 bodies
+				gforce = G * b1.getMass() * b2.getMass() / Math.pow(dist, 2);
 				
 				// Adds the acceleration to the total
-				xAcc += acc * xRatio;
-				yAcc += acc * yRatio;
+				xforce += gforce * xRatio;
+				yforce += gforce * yRatio;
 			}
 			
 			// Sets the acceleration of the body
-			b1.setAcc(xAcc, yAcc);
+			b1.applyForce(xforce, yforce);
 		}
 	}
 

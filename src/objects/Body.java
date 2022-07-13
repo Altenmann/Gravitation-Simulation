@@ -28,7 +28,7 @@ public class Body implements Collider {
 	public static Body heldBody;
 	public static Body selectedBody;
 	
-	public static boolean clamp = true;
+	public static boolean clamp = false;
 	private static int clampType = 1;
 	public static boolean shadows = false;
 	public static boolean showVectors = false;
@@ -49,12 +49,12 @@ public class Body implements Collider {
 	
 	private double bounciness = .777;
 	
-	public Body(String name, double x, double y, double radius, double mass) {
+	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.mass = mass;
-		this.radius = radius;
+		this.radius = diameter/2;
 		
 		xVel = 0;
 		yVel = 0;
@@ -65,8 +65,9 @@ public class Body implements Collider {
 	
 	// Checks if a given x and y position and camera location if its inside the boundaries of the circle
 	public boolean checkBounds(int x, int y, Camera camera) {
-		return (x >= this.x - radius - camera.getX() && x <= this.x + radius - camera.getX() && 
-				y <= this.y + radius - camera.getY() && y >= this.y - radius - camera.getY());
+		double zoom = camera.getZoom();
+		return (x >= Math.max( this.x*zoom - radius*zoom - camera.getX() , -2 ) && x <= this.x*zoom + radius*zoom - camera.getX() && 
+				y <= this.y*zoom + radius*zoom - camera.getY() && y >= this.y*zoom - radius*zoom - camera.getY());
 	}
 	
 	// What to do when a body is clicked
@@ -86,8 +87,8 @@ public class Body implements Collider {
 		if(Body.selectedBody == this) Body.heldBody = this;
 		else return;
 		
-		startingX = (int) x - camera.getX();
-		startingY = (int) y - camera.getY();
+		startingX = startClickX;
+		startingY = startClickY;
 		endX = startingX;
 		endY = startingY;
 	}
@@ -152,11 +153,12 @@ public class Body implements Collider {
 		if(stationary) return;
 		
 		// Changes position based on velocity
-		x = x + xVel;
-		y = y + yVel;
+		long dt = SolarSystemState.getTimeIncrement();
+		x = x + xVel * dt + xAcc * Math.pow(dt, 2) / 2;
+		y = y + yVel * dt + yAcc * Math.pow(dt, 2) / 2;
 		
-		xVel += xAcc;
-		yVel += yAcc;
+		xVel += xAcc * dt;
+		yVel += yAcc * dt;
 	}
 	
 	// Used to create basic shadow effects on bodies
@@ -169,7 +171,7 @@ public class Body implements Collider {
 	private void drawSelection(Graphics2D g2d, Camera camera) {
 		AffineTransform at = new AffineTransform();
 		at.translate(x - radius - 3 - camera.getX(), y - radius - 3 - camera.getY());
-		at.scale((radius+3)/32, (radius+3)/32);
+		at.scale((radius*camera.getZoom()+3)/32, (radius*camera.getZoom()+3)/32);
 		g2d.drawImage(Resource.cyanSelector, at, null);
 	}
 	
@@ -181,23 +183,33 @@ public class Body implements Collider {
 			drawSelection(g2d, camera);
 		}
 		
+		double xChange = x*camera.getZoom()-radius*camera.getZoom() - camera.getX();
+		double yChange = y*camera.getZoom()-radius*camera.getZoom() - camera.getY();
+		double rChange = radius*camera.getZoom();
+		
 		// Moves the transform to the x and y location and moves the image back half step
-		at.translate(x-radius - camera.getX(), y-radius - camera.getY());
+		at.translate(xChange, yChange);
 		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
-		at.scale(radius/32, radius/32);
+		at.scale(rChange/32, rChange/32);
 		
 		// Draws the current textured registered
 		g2d.drawImage(image, at, null);
+		
+		g.setColor(Color.white);
+		
+		g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
+		g.drawString(name, (int)xChange - 10, (int)yChange - 20);
+		
 		
 		// toggle shadows
 		if(shadows && !emitsPhotons) shadows( g2d, at );
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
-			int sx = startClickX;// - camera.getX();
-			int sy = startClickY;// - camera.getY();
-			int ex = endX;// - camera.getX();
-			int ey = endY;// - camera.getX();
+			int sx = startClickX;
+			int sy = startClickY;
+			int ex = endX;
+			int ey = endY;
 			g.setColor(Color.cyan);
 			g.drawLine(sx, sy, ex, ey);
 			
@@ -223,10 +235,15 @@ public class Body implements Collider {
 	
 	// Getters and setters
 	
+	// Returns valuable information about the planets
 	public String getStats() {
 		double velocity = Math.abs(xVel) + Math.abs(yVel);
 		// Prints the name along with velocity 
-		return name + ": " + String.format("%.4f", mass) + "  " + String.format("%.2f", velocity);
+		// TODO Fix the display of stats
+		return name + ": " 
+					+ String.format("%.3f", mass*1e-24) + "10^24 kg " 
+					+ String.format("%.1f", velocity*1e-3) + "km/s " 
+					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + "10^6 km";
 	}
 	
 	// Getters
@@ -306,4 +323,18 @@ public class Body implements Collider {
 		if(heldBody == this) heldBody = null;
 	}
 
+	public BufferedImage getResource() {
+		return image;
+	}
+
+	
+	public void applyForce(double xForce, double yForce) {
+		this.xAcc = xForce / mass;
+		this.yAcc = yForce / mass;
+	}
+
+	public void center(int width, int height) {
+		startClickX = width/2;
+		startClickY = height/2;
+	}
 }
