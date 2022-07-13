@@ -239,10 +239,11 @@ public class Body implements Collider {
 	public String getStats() {
 		double velocity = Math.abs(xVel) + Math.abs(yVel);
 		// Prints the name along with velocity 
+		// TODO Fix the display of stats
 		return name + ": " 
 					+ String.format("%.3f", mass*1e-24) + "10^24 kg " 
-					+ String.format("%.1f", velocity) + "km/s " 
-					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e6) + "10^6 km";
+					+ String.format("%.1f", velocity*1e-3) + "km/s " 
+					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + "10^6 km";
 	}
 	
 	// Getters

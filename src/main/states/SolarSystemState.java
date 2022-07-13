@@ -79,11 +79,13 @@ public class SolarSystemState extends State {
 
 	// Resets the state
 	public static void reset() {
+		// TODO After reset simulation camera doesn't work properly
 		bodies.clear(); // Clears the current bodies
 
 		// Sets the camera's position back to 0, 0
 		camera.setX(-engine.getWidth()/2);
 		camera.setY(-engine.getHeight()/2);
+		camera.setZoom(.00001);
 
 		// creates new set of bodies
 		bodySetSolarSystem1();
@@ -111,12 +113,16 @@ public class SolarSystemState extends State {
 		 * G = .1
 		 * Bodies to add
 		 */// Body               Name       X  Y (km)             Diameter(km)    Mass (kg)
-		Body Sun =		new Body("Sun", 	0, 0		   			, 1.39E+9, 		 1.989E+30);
-		Body Mercury = 	new Body("Mercury", 0, 57.9E+9				, 4879E+3, 	      .33E+24);
-		Body Venus = 	new Body("Venus", 	0, 108.2E+9				,12104E+3,       4.8E+24);
-		Body Earth = 	new Body("Earth", 	0, 149.6E+9				,12756E+3,       5.97E+24);
-		Body Moon = 	new Body("Moon", 	0, 149.6E+9 + .384E+9	, 3475E+3,        .073E+24);
-		Body Mars = 	new Body("Mars", 	0, 228E+9				, 6792E+3, 	      .642E+24);
+		Body Sun =		new Body("Sun", 	0, 0		   			,   1.39E+9, 	1.989E+30);
+		Body Mercury = 	new Body("Mercury", 0, 57.9E+9				,   4879E+3, 	   .33E+24);
+		Body Venus = 	new Body("Venus", 	0, 108.2E+9				,  12104E+3,      4.8E+24);
+		Body Earth = 	new Body("Earth", 	0, 149.6E+9				,  12756E+3,      5.97E+24);
+		Body Moon = 	new Body("Moon", 	0, 149.6E+9 + .384E+9	,   3475E+3,       .073E+24);
+		Body Mars = 	new Body("Mars", 	0, 228E+9				,   6792E+3, 	   .642E+24);
+		Body Jupiter =  new Body("Jupiter", 0, 778.5E+9 			, 142984E+3,   1898E+24);
+		Body Saturn = 	new Body("Saturn",  0, 1432.0E+9			, 120536E+3,    568E+24);
+		Body Uranus = 	new Body("Uranus",  0, 2867.0E+9			,  51118E+3,     86.8E+24);
+		Body Neptune = 	new Body("Neptune", 0, 4515.0E+9			,  49528E+3, 	102.0E+24);
 
 		// Initial velocities
 		Mercury.setVel(	47.4E+3, 0);
@@ -124,6 +130,10 @@ public class SolarSystemState extends State {
 		Earth.setVel  (	29.8E+3, 0);
 		Moon.setVel	  (	30.8E+3, 0);
 		Mars.setVel	  (	24.1E+3, 0);
+		Jupiter.setVel( 13.1E+3, 0);
+		Saturn.setVel (  9.7E+3, 0);
+		Uranus.setVel (  6.8E+3, 0);
+		Neptune.setVel(  5.4E+3, 0);
 
 		// Images used
 		Sun.setImage(Resource.sun);
@@ -146,6 +156,10 @@ public class SolarSystemState extends State {
 		bodies.add(Earth);
 		bodies.add(Moon);
 		bodies.add(Mars);
+		bodies.add(Jupiter);
+		bodies.add(Saturn);
+		bodies.add(Uranus);
+		bodies.add(Neptune);
 		
 		// Body Buttons
 		for(int i=0; i<bodies.size(); i++) {
