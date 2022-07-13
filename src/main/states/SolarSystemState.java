@@ -112,7 +112,7 @@ public class SolarSystemState extends State {
 		/* 
 		 * G = .1
 		 * Bodies to add
-		 */// Body               Name       X  Y (km)             Diameter(km)    Mass (kg)
+		 */// Body               Name       X  Y (m)             Diameter(m)    Mass (kg)
 		Body Sun =		new Body("Sun", 	0, 0		   			,   1.39E+9, 	1.989E+30);
 		Body Mercury = 	new Body("Mercury", 0, 57.9E+9				,   4879E+3, 	   .33E+24);
 		Body Venus = 	new Body("Venus", 	0, 108.2E+9				,  12104E+3,      4.8E+24);
@@ -124,7 +124,7 @@ public class SolarSystemState extends State {
 		Body Uranus = 	new Body("Uranus",  0, 2867.0E+9			,  51118E+3,     86.8E+24);
 		Body Neptune = 	new Body("Neptune", 0, 4515.0E+9			,  49528E+3, 	102.0E+24);
 
-		// Initial velocities
+		// Initial velocities (m/s)
 		Mercury.setVel(	47.4E+3, 0);
 		Venus.setVel  (	35.0E+3, 0);
 		Earth.setVel  (	29.8E+3, 0);
@@ -142,6 +142,10 @@ public class SolarSystemState extends State {
 		Earth.setImage(Resource.earth);
 		Moon.setImage(Resource.moon);
 		Mars.setImage(Resource.mars);
+		Jupiter.setImage(Resource.jupiter);
+		Saturn.setImage(Resource.saturn);
+		Uranus.setImage(Resource.uranus);
+		Neptune.setImage(Resource.neptune);
 
 		// For lighting (currently not implemented)
 		// Sun.toggleEmitter();

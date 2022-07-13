@@ -22,7 +22,7 @@ public class BodyButton extends Button {
 
 	@Override
 	public void onHover() {
-		SolarSystemState.center(b);
+		if(Body.selectedBody == null) SolarSystemState.center(b);
 	}
 
 	@Override

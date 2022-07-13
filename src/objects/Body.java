@@ -49,6 +49,8 @@ public class Body implements Collider {
 	
 	private double bounciness = .777;
 	
+	private int imageWidth, imageHeight;
+	
 	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
@@ -190,7 +192,7 @@ public class Body implements Collider {
 		// Moves the transform to the x and y location and moves the image back half step
 		at.translate(xChange, yChange);
 		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
-		at.scale(rChange/32, rChange/32);
+		at.scale(rChange/(imageWidth/2), rChange/(imageHeight/2));
 		
 		// Draws the current textured registered
 		g2d.drawImage(image, at, null);
@@ -271,6 +273,8 @@ public class Body implements Collider {
 	
 	// Sets the image
 	public void setImage(BufferedImage image) {
+		imageWidth = image.getWidth();
+		imageHeight = image.getHeight();
 		this.image = image;
 	}
 	

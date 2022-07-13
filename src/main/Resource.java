@@ -20,7 +20,8 @@ public final class Resource {
 	
 	public static BufferedImage milkyWayBg;
 	
-	// TODO Add the following bodies (Jupiter, Saturn, Uranus, Neptune)
+	// TODO Fix Saturn's image
+	public static BufferedImage jupiter, saturn, uranus, neptune;
 //--------------------------------------------------------------------------------
 // Initialization 
 //--------------------------------------------------------------------------------
@@ -55,6 +56,11 @@ public final class Resource {
 		blackhole = crop(128, 160, 64, 64);
 		
 		milkyWayBg = loadImage("/textures/milky-way.jpg");
+		
+		jupiter = loadImage("/textures/jupiter.png");
+		saturn = loadImage("/textures/saturn.png");
+		uranus = loadImage("/textures/uranus.png");
+		neptune = loadImage("/textures/neptune.png");
 	}
 	
 //--------------------------------------------------------------------------------

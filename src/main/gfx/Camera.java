@@ -12,6 +12,7 @@ package main.gfx;
  */
 public class Camera {
 	
+	// TODO Fix choppy camera
 	private int x, y, xoffset, yoffset;
 	private double zoom;
 	
