@@ -17,6 +17,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
@@ -27,7 +29,7 @@ import main.states.State;
 // Game Engine Class
 //--------------------------------------------------------------------------------
 public class GameEngine implements Runnable, KeyListener,
-	MouseMotionListener, MouseListener {
+	MouseMotionListener, MouseWheelListener, MouseListener {
 //--------------------------------------------------------------------------------
 // Variables
 //--------------------------------------------------------------------------------
@@ -141,6 +143,10 @@ public class GameEngine implements Runnable, KeyListener,
 	public void mouseMoved(MouseEvent e) {
 		State.currentState.mouseMoved(e);
 	}
+	
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		State.currentState.mouseWheelMoved(e);
+	}
 
 //--------------------------------------------------------------------------------
 // Main Thread (Main Loop)
@@ -204,11 +210,13 @@ public class GameEngine implements Runnable, KeyListener,
 				
 		// --- Input ---
 		jframe.addKeyListener(this);
-		canvas.addKeyListener(this);
 		jframe.addMouseListener(this);
-		canvas.addMouseListener(this);
 		jframe.addMouseMotionListener(this);
+		jframe.addMouseWheelListener(this);
+		canvas.addKeyListener(this);
+		canvas.addMouseListener(this);
 		canvas.addMouseMotionListener(this);
+		canvas.addMouseWheelListener(this);
 				
 		jframe.setVisible(true);
 				

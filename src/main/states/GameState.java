@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import main.GameEngine;
 import main.Resource;
@@ -62,5 +63,11 @@ public class GameState extends State {
 
 	@Override
 	public void mouseMoved(MouseEvent e) {}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

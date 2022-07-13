@@ -2,6 +2,7 @@ package main.states;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import main.GameEngine;
 import main.gfx.Camera;
@@ -17,12 +18,15 @@ public abstract class State {
 	
 	protected static Camera camera;
 	protected static boolean paused;
+	
+	protected double deltaTime;
 
 	public State(GameEngine engine) {
 		State.engine = engine;
 		
-		camera = new Camera(0, 0);
+		camera = new Camera(-engine.getWidth()/2, -engine.getHeight()/2);
 		camera.setOffset(0, 0);
+		deltaTime = 0;
 		paused = true;
 	}
 	
@@ -35,4 +39,6 @@ public abstract class State {
 	public abstract void mouseReleased(MouseEvent e);
 	public abstract void mousePressed(MouseEvent e);
 	public abstract void mouseMoved(MouseEvent e);
+	
+	public abstract void mouseWheelMoved(MouseWheelEvent e);
 }
