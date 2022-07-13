@@ -19,6 +19,8 @@ public final class Resource {
 	public static BufferedImage cursorSelector, cursorHand;
 	
 	public static BufferedImage milkyWayBg;
+	
+	// TODO Add the following bodies (Jupiter, Saturn, Uranus, Neptune)
 //--------------------------------------------------------------------------------
 // Initialization 
 //--------------------------------------------------------------------------------

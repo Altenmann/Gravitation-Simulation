@@ -65,9 +65,6 @@ public class GameState extends State {
 	public void mouseMoved(MouseEvent e) {}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseWheelMoved(MouseWheelEvent e) {}
 
 }
