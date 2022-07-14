@@ -77,16 +77,8 @@ public class SolarSystemState extends State {
 
 	// Resets the state
 	public static void reset() {
-		// TODO After reset simulation camera doesn't work properly
-		bodies.clear(); // Clears the current bodies
-
-		// Sets the camera's position back to 0, 0
-		camera.setX(-engine.getWidth()/2);
-		camera.setY(-engine.getHeight()/2);
-		camera.setZoom(.00001);
-
-		// creates new set of bodies
-		bodySetSolarSystem1();
+		// Reset the bodies back to original parameters
+		for(Body b : bodies) b.reset();
 
 		// Changes the cursor back to select
 		setCursorMode(CursorMode.select);
@@ -145,10 +137,7 @@ public class SolarSystemState extends State {
 		Uranus.setImage(Resource.uranus);
 		Neptune.setImage(Resource.neptune);
 		
-		Saturn.setRingBuffer(.7); // Quick fix for saturn
-
-		// For lighting (currently not implemented)
-		// Sun.toggleEmitter();
+		Saturn.setRingBuffer(.67); // Quick fix for saturn
 
 		// Main body used for finding relative distance to
 		Body.mainBody = Sun;
@@ -241,8 +230,8 @@ public class SolarSystemState extends State {
 		if (paused)
 			return; // Does not go past this if paused
 		
-		// Not checking for collisions 
-		//Collider.checkCollisions(bodies); // Checks if bodies are touching
+		// checking for collisions 
+		Collider.checkCollisions(bodies); // Checks if bodies are touching
 
 		if (!removeBodies.isEmpty())
 			bodies.removeAll(removeBodies);
@@ -264,7 +253,7 @@ public class SolarSystemState extends State {
 			camera.setY((int) desiredY);
 		}
 		
-		deltaTime ++;
+		deltaTime += timeIncrement;
 	}
 
 	// Drawing method
@@ -367,7 +356,7 @@ public class SolarSystemState extends State {
 	// Adds a black hole to the simulation
 	public static void addBlackHole() {
 		// TODO Black holes
-		Body blackhole = new Body("Black Hole", 0, 0, 14e6, 1e50);
+		Body blackhole = new Body("Black Hole", 0, 0, 14e6, 1e31);
 		blackhole.setImage(Resource.blackhole);
 		bodies.add(blackhole);
 		Body.selectedBody = blackhole;

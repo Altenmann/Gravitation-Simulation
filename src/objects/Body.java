@@ -47,12 +47,17 @@ public class Body implements Collider {
 	
 	private double ringBuffer;
 	
+	private double startVarX, startVarY, startVarXVel, startVarYVel;
+	
 	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.mass = mass;
 		this.radius = diameter/2;
+		
+		startVarX = x;
+		startVarY = y;
 		
 		xVel = 0;
 		yVel = 0;
@@ -114,8 +119,8 @@ public class Body implements Collider {
 		
 		double dist = Maths.dist(xdiff, ydiff);
 		
-		xVel += dist * (xdiff / tdiff) / 200;
-		yVel += dist * (ydiff / tdiff) / 200;
+		xVel += dist * (xdiff / tdiff);
+		yVel += dist * (ydiff / tdiff);
 		
 		release = true;
 	}
@@ -145,7 +150,7 @@ public class Body implements Collider {
 		double yChange = y*camera.getZoom()-radius*camera.getZoom() - camera.getY();
 		double rChange = radius*camera.getZoom();
 		
-		// Will only draw the resources if they are visible
+		// Will only draw the resources if they are on screen
 		if(xChange - rChange*2 > camera.getWidth() || xChange + rChange*2 < 0 || yChange - rChange*2 > camera.getHeight() || yChange + rChange*2 < 0) return;
 		
 		// Only draw Name and line if not visible
@@ -153,16 +158,15 @@ public class Body implements Collider {
 			g.setColor(Color.white);
 			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
 			g.drawString(name, (int)xChange - 10, (int)yChange - 20);
-			return;
+		} else {
+			// Moves the transform to the x and y location and moves the image back half step
+			at.translate(xChange, yChange);
+			// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
+			at.scale(rChange/(imageWidth/2), rChange*ringBuffer/(imageHeight/2));
+		
+			// Draws the current textured registered
+			g2d.drawImage(image, at, null);
 		}
-		
-		// Moves the transform to the x and y location and moves the image back half step
-		at.translate(xChange, yChange);
-		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
-		at.scale(rChange/(imageWidth/2), rChange*ringBuffer/(imageHeight/2));
-		
-		// Draws the current textured registered
-		g2d.drawImage(image, at, null);
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
@@ -177,20 +181,23 @@ public class Body implements Collider {
 			g.drawLine(sx, sy, sx + (sx - ex) / 2, sy + (sy - ey) / 2 );
 		}
 		
-		if(!showVectors) return;
+		// Shows line of velocity and acceleration
+		if(showVectors) {
+			double xVel = this.xVel;
+			double yVel = this.yVel;
+			if(selectedBody != null) {
+				double[] velDiff = getRelativeVelocity(selectedBody);
+				xVel = velDiff[0];
+				yVel = velDiff[1];
+			}
+			g.setColor(Color.green);
+			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)((xChange + rChange)+xVel/1E+3), (int)((yChange + rChange)+yVel/1E+3));
 		
-		double xVel = this.xVel;
-		double yVel = this.yVel;
-		if(selectedBody != null) {
-			double[] velDiff = getRelativeVelocity(selectedBody);
-			xVel = velDiff[0];
-			yVel = velDiff[1];
+			g.setColor(Color.red);
+			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)((xChange + rChange)+xAcc*1E+3), (int)((yChange + rChange)+yAcc*1E+3));
 		}
-		g.setColor(Color.green);
-		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xVel*50), (int)(y-camera.getY()+yVel*50));
 		
-		g.setColor(Color.red);
-		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xAcc*800), (int)(y-camera.getY()+yAcc*800));
+		
 	}
 	
 	// Getters and setters
@@ -221,6 +228,8 @@ public class Body implements Collider {
 	public void setVel(double xVel, double yVel) {
 		this.xVel = xVel;
 		this.yVel = yVel;
+		startVarXVel = xVel;
+		startVarYVel = yVel;
 	}
 	
 	// Sets the acceleration
@@ -297,5 +306,12 @@ public class Body implements Collider {
 	
 	public void setRingBuffer(double ringBuffer) {
 		this.ringBuffer = ringBuffer;
+	}
+	
+	public void reset() {
+		x = startVarX;
+		y = startVarY;
+		xVel = startVarXVel;
+		yVel = startVarYVel;
 	}
 }
