@@ -45,6 +45,8 @@ public class Body implements Collider {
 	
 	private int imageWidth, imageHeight;
 	
+	private double ringBuffer;
+	
 	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
@@ -54,6 +56,8 @@ public class Body implements Collider {
 		
 		xVel = 0;
 		yVel = 0;
+		
+		ringBuffer = 1f;
 		
 		// Defaults the image to a white circle
 		image = Resource.ball;
@@ -155,7 +159,7 @@ public class Body implements Collider {
 		// Moves the transform to the x and y location and moves the image back half step
 		at.translate(xChange, yChange);
 		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
-		at.scale(rChange/(imageWidth/2), rChange/(imageHeight/2));
+		at.scale(rChange/(imageWidth/2), rChange*ringBuffer/(imageHeight/2));
 		
 		// Draws the current textured registered
 		g2d.drawImage(image, at, null);
@@ -289,5 +293,9 @@ public class Body implements Collider {
 	public void center(int width, int height) {
 		startClickX = width/2;
 		startClickY = height/2;
+	}
+	
+	public void setRingBuffer(double ringBuffer) {
+		this.ringBuffer = ringBuffer;
 	}
 }

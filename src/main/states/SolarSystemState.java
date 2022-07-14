@@ -144,6 +144,8 @@ public class SolarSystemState extends State {
 		Saturn.setImage(Resource.saturn);
 		Uranus.setImage(Resource.uranus);
 		Neptune.setImage(Resource.neptune);
+		
+		Saturn.setRingBuffer(.7); // Quick fix for saturn
 
 		// For lighting (currently not implemented)
 		// Sun.toggleEmitter();
