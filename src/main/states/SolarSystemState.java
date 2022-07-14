@@ -16,7 +16,6 @@ import main.Resource;
 import main.buttons.AddBodyButton;
 import main.buttons.BodyButton;
 import main.buttons.Button;
-import main.buttons.ClampButton;
 import main.buttons.CursorModeButton;
 import main.buttons.PlayPauseButton;
 import main.buttons.ResetButton;
@@ -66,7 +65,6 @@ public class SolarSystemState extends State {
 		buttons.add(new ResetButton(500, 100, 32, 32)); // Resets the bodies to the starting positions and velocities
 		buttons.add(new CursorModeButton(540, 20, 32, 32)); // Changes the cursor mode (needs improvements)
 		buttons.add(new AddBodyButton(540, 60, 32, 32)); // Adds a black hole (later will add options)
-		buttons.add(new ClampButton(540, 100, 32, 32));
 
 		bodySetSolarSystem1(); // Adds set of Bodies
 	}
@@ -252,7 +250,6 @@ public class SolarSystemState extends State {
 
 		for (Body b : bodies) {
 			b.tick();
-			b.clamp(0, 0, engine.getWidth(), engine.getHeight());
 		}
 
 		if (Body.selectedBody != null) {
@@ -277,12 +274,6 @@ public class SolarSystemState extends State {
 		g2d.drawImage(Resource.milkyWayBg, 0, 0, engine.getWidth(), engine.getHeight(), null);
 		g.setColor(new Color(0, 0, 0, .85f));
 		g.fillRect(0, 0, engine.getWidth(), engine.getHeight());
-
-		// Border lines
-		if (Body.clamp) {
-			g.setColor(Color.white);
-			g.drawRect(-camera.getX(), -camera.getY(), engine.getWidth(), engine.getHeight());
-		}
 		
 		// Bodies
 		for (Body b : bodies) {
@@ -385,11 +376,6 @@ public class SolarSystemState extends State {
 		return Body.showVectors;
 	}
 
-	public static void clampSwitch() {
-		// TODO Clean this
-		Body.clamp = !Body.clamp;
-	}
-	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		camera.setZoom(camera.getZoom() * Math.pow(1.05, -e.getPreciseWheelRotation()) );

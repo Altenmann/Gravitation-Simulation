@@ -28,9 +28,6 @@ public class Body implements Collider {
 	public static Body heldBody;
 	public static Body selectedBody;
 	
-	public static boolean clamp = false;
-	private static int clampType = 1;
-	public static boolean shadows = false;
 	public static boolean showVectors = false;
 	
 	private String name;
@@ -42,12 +39,9 @@ public class Body implements Collider {
 	private int startClickX, startClickY;
 	
 	public boolean stationary = false;
-	private boolean emitsPhotons = false;
 	private boolean release = false;
 	
 	private BufferedImage image;
-	
-	private double bounciness = .777;
 	
 	private int imageWidth, imageHeight;
 	
@@ -122,31 +116,6 @@ public class Body implements Collider {
 		release = true;
 	}
 	
-	public void clamp(int minX, int minY, int maxX, int maxY) {
-		if (!Body.clamp) return; // Objects will fly away
-		
-		switch(clampType) {
-		
-			case 0: // Loops through the screen
-				if(x + radius < minX) x = maxX + radius;
-				if(x - radius > maxX) x = minX - radius;
-				if(y + radius < minY) y = maxY + radius;
-				if(y - radius > maxY) y = minY - radius;
-				break;
-			case 1: // Bounces off walls
-				if(x - radius <= minX) { x = minX + radius; xVel *= -bounciness; } 
-				else if(x + radius >= maxX) { x = maxX - radius; xVel *= -bounciness; }
-				if(y - radius <= minY) { y = minY + radius; yVel *= -bounciness; }
-				else if(y + radius >= maxY) { y = maxY - radius; yVel *= -bounciness; }
-				break;
-			default: // Stops at edge of screen
-				if(x - radius < minX) x = minX + radius;
-				if(x + radius > maxX) x = maxX - radius;
-				if(y - radius < minY) y = minY + radius;
-				if(y + radius > maxY) y = maxY - radius;
-		}
-	}
-	
 	public void tick() {
 		if(release) {
 			release = false;
@@ -163,39 +132,25 @@ public class Body implements Collider {
 		yVel += yAcc * dt;
 	}
 	
-	// Used to create basic shadow effects on bodies
-	private void shadows(Graphics2D g2d, AffineTransform at) {
-		// Rotates the shadow to be opposite of where the light is
-		at.rotate(getAngleTo(Body.mainBody) - Math.PI/2, 32, 32);
-		g2d.drawImage(Resource.shadow, at, null);
-	}
-	
-	private void drawSelection(Graphics2D g2d, Camera camera) {
-		AffineTransform at = new AffineTransform();
-		at.translate(x - radius - 3 - camera.getX(), y - radius - 3 - camera.getY());
-		at.scale((radius*camera.getZoom()+3)/32, (radius*camera.getZoom()+3)/32);
-		g2d.drawImage(Resource.cyanSelector, at, null);
-	}
-	
 	public void draw(Graphics g, Camera camera) {
 		Graphics2D g2d = (Graphics2D) g;
 		
 		AffineTransform at = new AffineTransform();
-		if(Body.selectedBody == this && SolarSystemState.getCursorMode() == CursorMode.select) {
-			drawSelection(g2d, camera);
-		}
 		
 		double xChange = x*camera.getZoom()-radius*camera.getZoom() - camera.getX();
 		double yChange = y*camera.getZoom()-radius*camera.getZoom() - camera.getY();
 		double rChange = radius*camera.getZoom();
 		
-		g.setColor(Color.white);
-		g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
-		g.drawString(name, (int)xChange - 10, (int)yChange - 20);
-		
-		
 		// Will only draw the resources if they are visible
-		if(rChange/(imageWidth/2) <= 1e-11 || xChange - rChange*2 > camera.getWidth() || xChange + rChange*2 < 0 || yChange - rChange*2 > camera.getHeight() || yChange + rChange*2 < 0) return;
+		if(xChange - rChange*2 > camera.getWidth() || xChange + rChange*2 < 0 || yChange - rChange*2 > camera.getHeight() || yChange + rChange*2 < 0) return;
+		
+		// Only draw Name and line if not visible
+		if(rChange/(imageWidth/2) <= 1E-3) {
+			g.setColor(Color.white);
+			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
+			g.drawString(name, (int)xChange - 10, (int)yChange - 20);
+			return;
+		}
 		
 		// Moves the transform to the x and y location and moves the image back half step
 		at.translate(xChange, yChange);
@@ -204,10 +159,6 @@ public class Body implements Collider {
 		
 		// Draws the current textured registered
 		g2d.drawImage(image, at, null);
-		
-		
-		// toggle shadows
-		if(shadows && !emitsPhotons) shadows( g2d, at );
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
@@ -303,11 +254,6 @@ public class Body implements Collider {
 		if(xdiff < 0) extraRotation = Math.PI;
 		
 		return Math.atan(ydiff / xdiff) + extraRotation;
-	}
-	
-	// Used with shadows thinking of removing it
-	public void toggleEmitter() {
-		emitsPhotons = !emitsPhotons;
 	}
 
 	public static void clearBodies() {
