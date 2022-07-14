@@ -16,7 +16,6 @@ import main.Resource;
 import main.buttons.AddBodyButton;
 import main.buttons.BodyButton;
 import main.buttons.Button;
-import main.buttons.ClampButton;
 import main.buttons.CursorModeButton;
 import main.buttons.PlayPauseButton;
 import main.buttons.ResetButton;
@@ -66,7 +65,6 @@ public class SolarSystemState extends State {
 		buttons.add(new ResetButton(500, 100, 32, 32)); // Resets the bodies to the starting positions and velocities
 		buttons.add(new CursorModeButton(540, 20, 32, 32)); // Changes the cursor mode (needs improvements)
 		buttons.add(new AddBodyButton(540, 60, 32, 32)); // Adds a black hole (later will add options)
-		buttons.add(new ClampButton(540, 100, 32, 32));
 
 		bodySetSolarSystem1(); // Adds set of Bodies
 	}
@@ -112,7 +110,7 @@ public class SolarSystemState extends State {
 		/* 
 		 * G = .1
 		 * Bodies to add
-		 */// Body               Name       X  Y (km)             Diameter(km)    Mass (kg)
+		 */// Body               Name       X  Y (m)             Diameter(m)    Mass (kg)
 		Body Sun =		new Body("Sun", 	0, 0		   			,   1.39E+9, 	1.989E+30);
 		Body Mercury = 	new Body("Mercury", 0, 57.9E+9				,   4879E+3, 	   .33E+24);
 		Body Venus = 	new Body("Venus", 	0, 108.2E+9				,  12104E+3,      4.8E+24);
@@ -124,7 +122,7 @@ public class SolarSystemState extends State {
 		Body Uranus = 	new Body("Uranus",  0, 2867.0E+9			,  51118E+3,     86.8E+24);
 		Body Neptune = 	new Body("Neptune", 0, 4515.0E+9			,  49528E+3, 	102.0E+24);
 
-		// Initial velocities
+		// Initial velocities (m/s)
 		Mercury.setVel(	47.4E+3, 0);
 		Venus.setVel  (	35.0E+3, 0);
 		Earth.setVel  (	29.8E+3, 0);
@@ -142,6 +140,12 @@ public class SolarSystemState extends State {
 		Earth.setImage(Resource.earth);
 		Moon.setImage(Resource.moon);
 		Mars.setImage(Resource.mars);
+		Jupiter.setImage(Resource.jupiter);
+		Saturn.setImage(Resource.saturn);
+		Uranus.setImage(Resource.uranus);
+		Neptune.setImage(Resource.neptune);
+		
+		Saturn.setRingBuffer(.7); // Quick fix for saturn
 
 		// For lighting (currently not implemented)
 		// Sun.toggleEmitter();
@@ -248,7 +252,6 @@ public class SolarSystemState extends State {
 
 		for (Body b : bodies) {
 			b.tick();
-			b.clamp(0, 0, engine.getWidth(), engine.getHeight());
 		}
 
 		if (Body.selectedBody != null) {
@@ -273,12 +276,6 @@ public class SolarSystemState extends State {
 		g2d.drawImage(Resource.milkyWayBg, 0, 0, engine.getWidth(), engine.getHeight(), null);
 		g.setColor(new Color(0, 0, 0, .85f));
 		g.fillRect(0, 0, engine.getWidth(), engine.getHeight());
-
-		// Border lines
-		if (Body.clamp) {
-			g.setColor(Color.white);
-			g.drawRect(-camera.getX(), -camera.getY(), engine.getWidth(), engine.getHeight());
-		}
 		
 		// Bodies
 		for (Body b : bodies) {
@@ -381,11 +378,6 @@ public class SolarSystemState extends State {
 		return Body.showVectors;
 	}
 
-	public static void clampSwitch() {
-		// TODO Clean this
-		Body.clamp = !Body.clamp;
-	}
-	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		camera.setZoom(camera.getZoom() * Math.pow(1.05, -e.getPreciseWheelRotation()) );

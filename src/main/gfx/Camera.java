@@ -12,8 +12,11 @@ package main.gfx;
  */
 public class Camera {
 	
+	// TODO Fix choppy camera
 	private int x, y, xoffset, yoffset;
 	private double zoom;
+	
+	private int width, height;
 	
 	public Camera(int x, int y) {
 		this.x = x;
@@ -47,5 +50,18 @@ public class Camera {
 	public void setLocation(double x2, double y2) {
 		x = (int) x2;
 		y = (int) y2;
+	}
+	
+	public void setScreenBounds(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 }

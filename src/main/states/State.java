@@ -26,6 +26,7 @@ public abstract class State {
 		
 		camera = new Camera(-engine.getWidth()/2, -engine.getHeight()/2);
 		camera.setOffset(0, 0);
+		camera.setScreenBounds(engine.getWidth(), engine.getHeight());
 		deltaTime = 0;
 		paused = true;
 	}

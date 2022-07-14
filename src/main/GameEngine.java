@@ -192,7 +192,7 @@ public class GameEngine implements Runnable, KeyListener,
 //--------------------------------------------------------------------------------
 	private void createWindow() {
 		// --- JFrame ---
-		jframe = new JFrame("");
+		jframe = new JFrame("Gravitation Simulation");
 				
 		// Sets the jframe full screen
 		jframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
