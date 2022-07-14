@@ -33,12 +33,12 @@ public final class Resource {
 		ball = crop(0, 32, 64, 64);
 		shadow = crop(0, 96, 64, 64);
 		
-		sun = crop(64, 96, 64, 64);
-		mercury = crop(128, 32, 64, 64);
-		venus = crop(192, 32, 64, 64);
-		earth = crop(64, 32, 64, 64);
-		moon = crop(128, 96, 64, 64);
-		mars = crop(192, 96, 64, 64);
+		//sun = crop(64, 96, 64, 64);
+		//mercury = crop(128, 32, 64, 64);
+		//venus = crop(192, 32, 64, 64);
+		//earth = crop(64, 32, 64, 64);
+		//moon = crop(128, 96, 64, 64);
+		//mars = crop(192, 96, 64, 64);
 		
 		vectorOff = crop(64, 0, 32, 32);
 		vectorOn = crop(96, 0, 32, 32);
@@ -61,6 +61,14 @@ public final class Resource {
 		saturn = loadImage("/textures/saturn.png");
 		uranus = loadImage("/textures/uranus.png");
 		neptune = loadImage("/textures/neptune.png");
+		
+		mercury = loadImage("/textures/mercury.png");
+		venus = loadImage("/textures/venus.png");
+		earth = loadImage("/textures/earth.png");
+		moon = loadImage("/textures/moon.png");
+		mars = loadImage("/textures/mars.png");
+		
+		sun = loadImage("/textures/sun.png");
 	}
 	
 //--------------------------------------------------------------------------------

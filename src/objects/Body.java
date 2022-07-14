@@ -189,6 +189,14 @@ public class Body implements Collider {
 		double yChange = y*camera.getZoom()-radius*camera.getZoom() - camera.getY();
 		double rChange = radius*camera.getZoom();
 		
+		g.setColor(Color.white);
+		g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
+		g.drawString(name, (int)xChange - 10, (int)yChange - 20);
+		
+		
+		// Will only draw the resources if they are visible
+		if(rChange/(imageWidth/2) <= 1e-11 || xChange - rChange*2 > camera.getWidth() || xChange + rChange*2 < 0 || yChange - rChange*2 > camera.getHeight() || yChange + rChange*2 < 0) return;
+		
 		// Moves the transform to the x and y location and moves the image back half step
 		at.translate(xChange, yChange);
 		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
@@ -196,11 +204,6 @@ public class Body implements Collider {
 		
 		// Draws the current textured registered
 		g2d.drawImage(image, at, null);
-		
-		g.setColor(Color.white);
-		
-		g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
-		g.drawString(name, (int)xChange - 10, (int)yChange - 20);
 		
 		
 		// toggle shadows
@@ -243,9 +246,9 @@ public class Body implements Collider {
 		// Prints the name along with velocity 
 		// TODO Fix the display of stats
 		return name + ": " 
-					+ String.format("%.3f", mass*1e-24) + "10^24 kg " 
-					+ String.format("%.1f", velocity*1e-3) + "km/s " 
-					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + "10^6 km";
+					+ String.format("%.3f", mass*1e-24) + " 10^24 kg  " 
+					+ String.format("%.1f", velocity*1e-3) + " km/s  " 
+					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + " 10^6 km";
 	}
 	
 	// Getters
