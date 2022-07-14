@@ -33,13 +33,6 @@ public final class Resource {
 		ball = crop(0, 32, 64, 64);
 		shadow = crop(0, 96, 64, 64);
 		
-		//sun = crop(64, 96, 64, 64);
-		//mercury = crop(128, 32, 64, 64);
-		//venus = crop(192, 32, 64, 64);
-		//earth = crop(64, 32, 64, 64);
-		//moon = crop(128, 96, 64, 64);
-		//mars = crop(192, 96, 64, 64);
-		
 		vectorOff = crop(64, 0, 32, 32);
 		vectorOn = crop(96, 0, 32, 32);
 		whiteCircleArrow = crop(128, 0, 32, 32);
