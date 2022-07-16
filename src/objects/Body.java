@@ -49,6 +49,10 @@ public class Body implements Collider {
 	
 	private double startVarX, startVarY, startVarXVel, startVarYVel;
 	
+	private double maxDist, maxVel, minDist, minVel;
+	
+	private double velocity;
+	
 	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
@@ -61,6 +65,17 @@ public class Body implements Collider {
 		
 		xVel = 0;
 		yVel = 0;
+		
+		if(Body.mainBody != null) {
+			maxDist = getDistTo(Body.mainBody);
+			minDist = maxDist;
+		} else {
+			maxDist = 0;
+			minDist = 1e100;
+		}
+		
+		minVel = 0;
+		maxVel = 0;
 		
 		ringBuffer = 1f;
 		
@@ -133,12 +148,20 @@ public class Body implements Collider {
 		if(stationary) return;
 		
 		// Changes position based on velocity
-		long dt = SolarSystemState.getTimeIncrement();
+		double dt = SolarSystemState.getTimeIncrement();
 		x = x + xVel * dt + xAcc * Math.pow(dt, 2) / 2;
 		y = y + yVel * dt + yAcc * Math.pow(dt, 2) / 2;
 		
 		xVel += xAcc * dt;
 		yVel += yAcc * dt;
+		
+		velocity = Math.abs(xVel) + Math.abs(yVel);
+		if( maxVel < velocity) maxVel = velocity;
+		else if( minVel > velocity) minVel = velocity;
+		
+		double dist = getDistTo(mainBody);
+		if( maxDist < dist) maxDist = dist;
+		else if( minDist > dist) minDist = dist;
 	}
 	
 	public void draw(Graphics g, Camera camera) {
@@ -204,13 +227,15 @@ public class Body implements Collider {
 	
 	// Returns valuable information about the planets
 	public String getStats() {
-		double velocity = Math.abs(xVel) + Math.abs(yVel);
+		//double velocity = Math.abs(xVel) + Math.abs(yVel);
 		// Prints the name along with velocity 
 		// TODO Fix the display of stats
-		return name + ": " 
-					+ String.format("%.3f", mass*1e-24) + " 10^24 kg  " 
-					+ String.format("%.1f", velocity*1e-3) + " km/s  " 
-					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + " 10^6 km";
+		return getStringBuffer(name, 12) + ": " 
+					+ getStringBuffer(String.format("%.3f", mass/1E+24) + " 10^24 kg", 21 ) + " "
+					+ getStringBuffer(String.format("%.1f", velocity/1E+3) + " km/s", 14) + " "
+					+ getStringBuffer(String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1E+9) + " 10^6 km", 18) + "   "
+					+ "Min/Max Distance: " + getStringBuffer(String.format("%.1f", minDist / 1E+9) + " / " + String.format("%.1f", maxDist/1E+9), 14) + "  "
+					+ "Max/Min Velocity: " + getStringBuffer(String.format("%.1f", maxVel/1E+3) + " / " + String.format("%.1f", minVel/1E+3), 14);
 	}
 	
 	// Getters
@@ -230,6 +255,10 @@ public class Body implements Collider {
 		this.yVel = yVel;
 		startVarXVel = xVel;
 		startVarYVel = yVel;
+		
+		velocity = Math.abs(xVel) + Math.abs(yVel);
+		minVel = velocity;
+		maxVel = velocity;
 	}
 	
 	// Sets the acceleration
@@ -313,5 +342,18 @@ public class Body implements Collider {
 		y = startVarY;
 		xVel = startVarXVel;
 		yVel = startVarYVel;
+	}
+	
+	private String getStringBuffer(String s1, int length) {
+		
+		if(s1.length() >= length) return s1;
+		
+		String s2 = "";
+		
+		for(int i=s1.length(); i<=length; i++) {
+			s2 += " ";
+		}
+		
+		return s2+s1;
 	}
 }

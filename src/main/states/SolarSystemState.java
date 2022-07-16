@@ -45,7 +45,7 @@ public class SolarSystemState extends State {
 	// Changes the cursor mode to interact with things differently
 	private static CursorMode cursorMode;
 	
-	private static long timeIncrement = 1000;
+	private static double timeIncrement = 10;
 
 	public SolarSystemState(GameEngine engine) {
 		super(engine); // Creates this state
@@ -60,11 +60,11 @@ public class SolarSystemState extends State {
 		setCursor(); // Will set the frame's cursor based on the current cursor mode
 
 		// Adds the various buttons
-		buttons.add(new PlayPauseButton(500, 20, 32, 32, paused)); // Plays & pauses
-		buttons.add(new VectorButton(500, 60, 32, 32)); // Turn on and off vectors
-		buttons.add(new ResetButton(500, 100, 32, 32)); // Resets the bodies to the starting positions and velocities
-		buttons.add(new CursorModeButton(540, 20, 32, 32)); // Changes the cursor mode (needs improvements)
-		buttons.add(new AddBodyButton(540, 60, 32, 32)); // Adds a black hole (later will add options)
+		buttons.add(new PlayPauseButton(800, 20, 32, 32, paused)); // Plays & pauses
+		buttons.add(new VectorButton(800, 60, 32, 32)); // Turn on and off vectors
+		buttons.add(new ResetButton(800, 100, 32, 32)); // Resets the bodies to the starting positions and velocities
+		buttons.add(new CursorModeButton(840, 20, 32, 32)); // Changes the cursor mode (needs improvements)
+		buttons.add(new AddBodyButton(840, 60, 32, 32)); // Adds a black hole (later will add options)
 
 		bodySetSolarSystem1(); // Adds set of Bodies
 	}
@@ -104,26 +104,30 @@ public class SolarSystemState extends State {
 		 * Bodies to add
 		 */// Body               Name       X  Y (m)             Diameter(m)    Mass (kg)
 		Body Sun =		new Body("Sun", 	0, 0		   			,   1.39E+9, 	1.989E+30);
-		Body Mercury = 	new Body("Mercury", 0, 57.9E+9				,   4879E+3, 	   .33E+24);
-		Body Venus = 	new Body("Venus", 	0, 108.2E+9				,  12104E+3,      4.8E+24);
-		Body Earth = 	new Body("Earth", 	0, 149.6E+9				,  12756E+3,      5.97E+24);
-		Body Moon = 	new Body("Moon", 	0, 149.6E+9 + .384E+9	,   3475E+3,       .073E+24);
-		Body Mars = 	new Body("Mars", 	0, 228E+9				,   6792E+3, 	   .642E+24);
-		Body Jupiter =  new Body("Jupiter", 0, 778.5E+9 			, 142984E+3,   1898E+24);
-		Body Saturn = 	new Body("Saturn",  0, 1432.0E+9			, 120536E+3,    568E+24);
-		Body Uranus = 	new Body("Uranus",  0, 2867.0E+9			,  51118E+3,     86.8E+24);
-		Body Neptune = 	new Body("Neptune", 0, 4515.0E+9			,  49528E+3, 	102.0E+24);
+		
+		// Main body used for finding relative distance to
+		Body.mainBody = Sun;
+		
+		Body Mercury = 	new Body("Mercury", 0, -46E+9				,   4879E+3, 	   .33E+24);
+		Body Venus = 	new Body("Venus", 	0, 107.5E+9				,  12104E+3,      4.8E+24);
+		Body Earth = 	new Body("Earth", 	0, 147.1E+9				,  12756E+3,      5.97E+24);
+		Body Moon = 	new Body("Moon", 	0, 147.1E+9 + .363E+9	,   3475E+3,       .073E+24);
+		Body Mars = 	new Body("Mars", 	0, 206.7E+9				,   6792E+3, 	   .642E+24);
+		Body Jupiter =  new Body("Jupiter", 0, 740.6E+9 			, 142984E+3,   1898E+24);
+		Body Saturn = 	new Body("Saturn",  0, 1357.6E+9			, 120536E+3,    568E+24);
+		Body Uranus = 	new Body("Uranus",  0, 2732.7E+9			,  51118E+3,     86.8E+24);
+		Body Neptune = 	new Body("Neptune", 0, 4471.1E+9			,  49528E+3, 	102.0E+24);
 
 		// Initial velocities (m/s)
-		Mercury.setVel(	47.4E+3, 0);
-		Venus.setVel  (	35.0E+3, 0);
-		Earth.setVel  (	29.8E+3, 0);
-		Moon.setVel	  (	30.8E+3, 0);
-		Mars.setVel	  (	24.1E+3, 0);
-		Jupiter.setVel( 13.1E+3, 0);
-		Saturn.setVel (  9.7E+3, 0);
-		Uranus.setVel (  6.8E+3, 0);
-		Neptune.setVel(  5.4E+3, 0);
+		Mercury.setVel(	-59E+3, 0);
+		Venus.setVel  (	35.2E+3, 0);
+		Earth.setVel  (	30.29E+3, 0);
+		Moon.setVel	  (	30.29E+3 + 1082, 0);
+		Mars.setVel	  (	24.07E+3, 0);
+		Jupiter.setVel( 13.72E+3, 0);
+		Saturn.setVel ( 10.18E+3, 0);
+		Uranus.setVel (  7.11E+3, 0);
+		Neptune.setVel(  5.5E+3, 0);
 
 		// Images used
 		Sun.setImage(Resource.sun);
@@ -138,9 +142,6 @@ public class SolarSystemState extends State {
 		Neptune.setImage(Resource.neptune);
 		
 		Saturn.setRingBuffer(.67); // Quick fix for saturn
-
-		// Main body used for finding relative distance to
-		Body.mainBody = Sun;
 
 		// Adds the bodies created to the ArrayList
 		bodies.add(Sun);
@@ -378,7 +379,7 @@ public class SolarSystemState extends State {
 		//camera.setZoom(.00001);
 	}
 	
-	public static long getTimeIncrement() {
+	public static double getTimeIncrement() {
 		return timeIncrement;
 	}
 

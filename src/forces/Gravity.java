@@ -9,7 +9,7 @@ import objects.Body;
 public class Gravity {
 	
 	// Gravitational constant
-	static final double G = 6.6743E-11;
+	static final double G = 6.673889E-11;
 	
 	public static void Gravitate(ArrayList<Body> bodies) {
 		
