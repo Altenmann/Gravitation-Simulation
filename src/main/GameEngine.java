@@ -91,7 +91,7 @@ public class GameEngine implements Runnable, KeyListener,
 	
 	public void update() {
 		if(State.currentState == null) return;
-		tick();
+		tick(); // TODO Fast Forward
 		render();
 	}
 	

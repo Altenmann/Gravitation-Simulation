@@ -47,6 +47,12 @@ public class Body implements Collider {
 	
 	private double ringBuffer;
 	
+	private double startVarX, startVarY, startVarXVel, startVarYVel;
+	
+	private double maxDist, maxVel, minDist, minVel;
+	
+	private double velocity;
+	
 	public Body(String name, double x, double y, double diameter, double mass) {
 		this.name = name;
 		this.x = x;
@@ -54,8 +60,22 @@ public class Body implements Collider {
 		this.mass = mass;
 		this.radius = diameter/2;
 		
+		startVarX = x;
+		startVarY = y;
+		
 		xVel = 0;
 		yVel = 0;
+		
+		if(Body.mainBody != null) {
+			maxDist = getDistTo(Body.mainBody);
+			minDist = maxDist;
+		} else {
+			maxDist = 0;
+			minDist = 1e100;
+		}
+		
+		minVel = 0;
+		maxVel = 0;
 		
 		ringBuffer = 1f;
 		
@@ -114,8 +134,8 @@ public class Body implements Collider {
 		
 		double dist = Maths.dist(xdiff, ydiff);
 		
-		xVel += dist * (xdiff / tdiff) / 200;
-		yVel += dist * (ydiff / tdiff) / 200;
+		xVel += dist * (xdiff / tdiff);
+		yVel += dist * (ydiff / tdiff);
 		
 		release = true;
 	}
@@ -128,12 +148,20 @@ public class Body implements Collider {
 		if(stationary) return;
 		
 		// Changes position based on velocity
-		long dt = SolarSystemState.getTimeIncrement();
+		double dt = SolarSystemState.getTimeIncrement();
 		x = x + xVel * dt + xAcc * Math.pow(dt, 2) / 2;
 		y = y + yVel * dt + yAcc * Math.pow(dt, 2) / 2;
 		
 		xVel += xAcc * dt;
 		yVel += yAcc * dt;
+		
+		velocity = Math.abs(xVel) + Math.abs(yVel);
+		if( maxVel < velocity) maxVel = velocity;
+		else if( minVel > velocity) minVel = velocity;
+		
+		double dist = getDistTo(mainBody);
+		if( maxDist < dist) maxDist = dist;
+		else if( minDist > dist) minDist = dist;
 	}
 	
 	public void draw(Graphics g, Camera camera) {
@@ -145,7 +173,7 @@ public class Body implements Collider {
 		double yChange = y*camera.getZoom()-radius*camera.getZoom() - camera.getY();
 		double rChange = radius*camera.getZoom();
 		
-		// Will only draw the resources if they are visible
+		// Will only draw the resources if they are on screen
 		if(xChange - rChange*2 > camera.getWidth() || xChange + rChange*2 < 0 || yChange - rChange*2 > camera.getHeight() || yChange + rChange*2 < 0) return;
 		
 		// Only draw Name and line if not visible
@@ -153,16 +181,15 @@ public class Body implements Collider {
 			g.setColor(Color.white);
 			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)xChange - 10, (int)yChange - 10);
 			g.drawString(name, (int)xChange - 10, (int)yChange - 20);
-			return;
+		} else {
+			// Moves the transform to the x and y location and moves the image back half step
+			at.translate(xChange, yChange);
+			// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
+			at.scale(rChange/(imageWidth/2), rChange*ringBuffer/(imageHeight/2));
+		
+			// Draws the current textured registered
+			g2d.drawImage(image, at, null);
 		}
-		
-		// Moves the transform to the x and y location and moves the image back half step
-		at.translate(xChange, yChange);
-		// Images are 64 pixels, dividing by 32 gives proper radius of scaled image
-		at.scale(rChange/(imageWidth/2), rChange*ringBuffer/(imageHeight/2));
-		
-		// Draws the current textured registered
-		g2d.drawImage(image, at, null);
 		
 		// Drag line
 		if(Body.heldBody == this || release) {
@@ -177,33 +204,38 @@ public class Body implements Collider {
 			g.drawLine(sx, sy, sx + (sx - ex) / 2, sy + (sy - ey) / 2 );
 		}
 		
-		if(!showVectors) return;
+		// Shows line of velocity and acceleration
+		if(showVectors) {
+			double xVel = this.xVel;
+			double yVel = this.yVel;
+			if(selectedBody != null) {
+				double[] velDiff = getRelativeVelocity(selectedBody);
+				xVel = velDiff[0];
+				yVel = velDiff[1];
+			}
+			g.setColor(Color.green);
+			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)((xChange + rChange)+xVel/1E+3), (int)((yChange + rChange)+yVel/1E+3));
 		
-		double xVel = this.xVel;
-		double yVel = this.yVel;
-		if(selectedBody != null) {
-			double[] velDiff = getRelativeVelocity(selectedBody);
-			xVel = velDiff[0];
-			yVel = velDiff[1];
+			g.setColor(Color.red);
+			g.drawLine((int)(xChange + rChange), (int)(yChange + rChange), (int)((xChange + rChange)+xAcc*1E+3), (int)((yChange + rChange)+yAcc*1E+3));
 		}
-		g.setColor(Color.green);
-		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xVel*50), (int)(y-camera.getY()+yVel*50));
 		
-		g.setColor(Color.red);
-		g.drawLine((int)x-camera.getX(), (int)y-camera.getY(), (int)(x-camera.getX()+xAcc*800), (int)(y-camera.getY()+yAcc*800));
+		
 	}
 	
 	// Getters and setters
 	
 	// Returns valuable information about the planets
 	public String getStats() {
-		double velocity = Math.abs(xVel) + Math.abs(yVel);
+		//double velocity = Math.abs(xVel) + Math.abs(yVel);
 		// Prints the name along with velocity 
 		// TODO Fix the display of stats
-		return name + ": " 
-					+ String.format("%.3f", mass*1e-24) + " 10^24 kg  " 
-					+ String.format("%.1f", velocity*1e-3) + " km/s  " 
-					+ String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1e9) + " 10^6 km";
+		return getStringBuffer(name, 12) + ": " 
+					+ getStringBuffer(String.format("%.3f", mass/1E+24) + " 10^24 kg", 21 ) + " "
+					+ getStringBuffer(String.format("%.1f", velocity/1E+3) + " km/s", 14) + " "
+					+ getStringBuffer(String.format("%.2f", (getDistTo((Body.selectedBody != null) ? Body.selectedBody : Body.mainBody)) / 1E+9) + " 10^6 km", 18) + "   "
+					+ "Min/Max Distance: " + getStringBuffer(String.format("%.1f", minDist / 1E+9) + " / " + String.format("%.1f", maxDist/1E+9), 14) + "  "
+					+ "Max/Min Velocity: " + getStringBuffer(String.format("%.1f", maxVel/1E+3) + " / " + String.format("%.1f", minVel/1E+3), 14);
 	}
 	
 	// Getters
@@ -221,6 +253,12 @@ public class Body implements Collider {
 	public void setVel(double xVel, double yVel) {
 		this.xVel = xVel;
 		this.yVel = yVel;
+		startVarXVel = xVel;
+		startVarYVel = yVel;
+		
+		velocity = Math.abs(xVel) + Math.abs(yVel);
+		minVel = velocity;
+		maxVel = velocity;
 	}
 	
 	// Sets the acceleration
@@ -297,5 +335,25 @@ public class Body implements Collider {
 	
 	public void setRingBuffer(double ringBuffer) {
 		this.ringBuffer = ringBuffer;
+	}
+	
+	public void reset() {
+		x = startVarX;
+		y = startVarY;
+		xVel = startVarXVel;
+		yVel = startVarYVel;
+	}
+	
+	private String getStringBuffer(String s1, int length) {
+		
+		if(s1.length() >= length) return s1;
+		
+		String s2 = "";
+		
+		for(int i=s1.length(); i<=length; i++) {
+			s2 += " ";
+		}
+		
+		return s2+s1;
 	}
 }
